@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Generator Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>AI Video Generator</h1>
+        <p>Create stunning videos with AI</p>
+    </header>
+    <main class="dashboard">
+        <section id="input-section">
+            <h2>Script Input</h2>
+            <form id="generate-form" action="{{ url_for('generate') }}" method="POST">
+                <div class="form-group">
+                    <label for="script">Enter your script or topic:</label>
+                    <textarea id="script" name="script" rows="6" placeholder="e.g., 'The future of AI in healthcare...' or 'Artificial Intelligence'">{{ session.get('last_script', '') }}</textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="voice">Voice (ElevenLabs)</label>
+                        <select id="voice" name="voice" required>
+                            <option value="">Select a voice</option>
+                            {% for voice_id, voice_name in voices.items() %}
+                                <option value="{{ voice_id }}" {% if session.get('last_voice') == voice_id %}selected{% endif %}>{{ voice_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="image_style">Image Style</label>
+                        <select id="image_style" name="image_style">
+                            <option value="realistic" {% if session.get('last_image_style') == 'realistic' %}selected{% endif %}>Realistic</option>
+                            <option value="cinematic" {% if session.get('last_image_style') == 'cinematic' %}selected{% endif %}>Cinematic</option>
+                            <option value="anime" {% if session.get('last_image_style') == 'anime' %}selected{% endif %}>Anime</option>
+                            <option value="abstract" {% if session.get('last_image_style') == 'abstract' %}selected{% endif %}>Abstract</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" id="generate-btn">Generate Video</button>
+            </form>
+        </section>
+
+        <section id="status-section">
+            <h2>Generation Status</h2>
+            <div id="progress-bar">
+                <div id="progress-fill" style="width: 0%;"></div>
+            </div>
+            <p id="status-message">{{ session.get('status', 'Ready') }}</p>
+        </section>
+
+        <section id="result-section">
+            <h2>Result</h2>
+            {% if video_url %}
+                <video controls width="100%">
+                    <source src="{{ video_url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <a href="{{ video_url }}" download class="download-btn">Download Video</a>
+            {% else %}
+                <p>No video yet. Generate one above.</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 AI Video Platform</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
